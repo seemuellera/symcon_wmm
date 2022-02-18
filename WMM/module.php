@@ -152,6 +152,6 @@ class WMM extends IPSModule {
 
 		$avgPower = $sumPower / count($arrPower);
 
-		SetValue($this->GetIDForIdent("PowerAvg", $avgPower);
+		SetValue($this->GetIDForIdent("PowerAvg"), $avgPower);
 	}
 }

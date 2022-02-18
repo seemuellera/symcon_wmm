@@ -75,16 +75,8 @@ class WMM extends IPSModule {
 		$this->RegisterReference($this->ReadPropertyInteger("SourceVariable"));
 
 		//Actions
-		if (! $this->ReadPropertyBoolean("ReadOnly") ) {
-		
-			$this->EnableAction("Status");
-		}
-		else {
-			
-			$this->DisableAction("Status");
-		}
-
-		
+		$this->EnableAction("Status");
+				
 		// Diese Zeile nicht löschen
 		parent::ApplyChanges();
 	}

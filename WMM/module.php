@@ -25,11 +25,27 @@ class WMM extends IPSModule {
 		$this->RegisterPropertyInteger("SourceVariable",0);
 		$this->RegisterPropertyInteger("ArchiveId",0);
 		$this->RegisterPropertyInteger("MinutesAvg",5);
+		$this->RegisterPropertyInteger("StandbyThreshold",10);
+		$this->RegisterPropertyInteger("OffThreshold",1);
+		
+		// Variable profiles
+		$variableProfileMachineStatus = "WMM.MachineStatus";
+		if (IPS_VariableProfileExists($variableProfileMachineStatus) ) {
+		
+			IPS_DeleteVariableProfile($variableProfileMachineStatus);
+		}			
+		IPS_CreateVariableProfile($variableProfileMachineStatus, 1);
+		IPS_SetVariableProfileIcon($variableProfileMachineStatus, "Database");
+		IPS_SetVariableProfileAssociation($variableProfileMachineStatus, 0, "aus", "Power", -1);
+		IPS_SetVariableProfileAssociation($variableProfileMachineStatus, 1, "läuft", "EnergyProduction", 0x00FF00);
+		IPS_SetVariableProfileAssociation($variableProfileMachineStatus, 2, "beendet", "Flag", 0xD900FF);
+		IPS_SetVariableProfileAssociation($variableProfileMachineStatus, 3, "Standby", "Power", 0xCFCFCF);
 		
 		// Variables
 		$this->RegisterVariableBoolean("Status","Status","~Switch");
 		$this->RegisterVariableFloat("PowerAvg","Average Power Consumption","~Watt.3680");
-		
+		$this->RegisterVariableInteger("MachineStatus","Machine Status",$variableProfileMachineStatus);
+				
 		// Timer
 		$this->RegisterTimer("RefreshInformation", 0 , 'WMM_RefreshInformation($_IPS[\'TARGET\']);');
     }
@@ -54,6 +70,8 @@ class WMM extends IPSModule {
 		$form['elements'][] = Array("type" => "SelectVariable", "name" => "SourceVariable", "caption" => "Source Variable");
 		$form['elements'][] = Array("type" => "SelectModule", "name" => "ArchiveId", "caption" => "Select Archive instance", "moduleID" => "{43192F0B-135B-4CE7-A0A7-1475603F3060}");
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "MinutesAvg", "caption" => "Average minutes to be used for power load");
+		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "StandbyThreshold", "caption" => "Threshold below which the machine is considered to be in Standby / finished");
+		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "OffThreshold", "caption" => "Threshold below which the machine is considered to be off");
 				
 		// Add the buttons for the test center
 		$form['actions'][] = Array(	"type" => "Button", "label" => "Refresh", "onClick" => 'WMM_RefreshInformation($id);');
@@ -73,6 +91,8 @@ class WMM extends IPSModule {
 		// Register Variables
 		$this->RegisterMessage($this->ReadPropertyInteger("SourceVariable"), VM_UPDATE);
 		$this->RegisterReference($this->ReadPropertyInteger("SourceVariable"));
+		
+		$this->RegisterReference($this->ReadPropertyInteger("ArchiveId"));
 
 		//Actions
 		$this->EnableAction("Status");
@@ -129,6 +149,7 @@ class WMM extends IPSModule {
 		$this->LogMessage("Refresh in progress","DEBUG");
 		
 		SetValue($this->GetIDForIdent("PowerAvg"), $this->getAverageValue());
+		SetValue($this->GetIDForIdent("MachineStatus"), $this->getMachineStatus());
 	}
 	
 	public function MessageSink($TimeStamp, $SenderId, $Message, $Data) {
@@ -152,5 +173,40 @@ class WMM extends IPSModule {
 		$avgPower = $sumPower / count($arrPower);
 
 		return $avgPower;
+	}
+	
+	private function getMachineStatus() {
+		
+		$powerAvg = $this->getAverageValue();
+		$standbyThreshold = $this->ReadPropertyInteger("StandbyThreshold");
+		$offThreshold = $this->ReadPropertyInteger("OffThreshold");
+		$oldMachineStatus = GetValue($this->GetIDForIdent("MachineStatus"));
+		
+		
+		if ($powerAvg <= $offThreshold) {
+			
+			$this->LogMessage("The machine changed to off","DEBUG");
+			return 0;
+		}
+		
+		if ($powerAvg <= $standbyThreshold) {
+		
+			// If the machine changes from off to below standby we consider it to be in Standby
+			if ($oldMachineStatus == 0) {
+				
+				$this->LogMessage("Machine changed from off to Standby","DEBUG");
+				return 3;
+			}
+			
+			// If the machine changes from running to below threshold we consider it to be finished
+			if ($oldMachineStatus == 1) {
+				
+				$this->LogMessage("Machine changed from running to finished","DEBUG");
+				return 2;
+			}
+		}
+		
+		// machine is running
+		return 1;
 	}
 }

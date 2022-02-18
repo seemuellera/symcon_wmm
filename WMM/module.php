@@ -107,6 +107,11 @@ class WMM extends IPSModule {
 		
 			case "Status":
 				SetValue($this->GetIDForIdent($Ident), $Value);
+				// Refresh Information if Status was turned on:
+				if ($Value) {
+					
+					$this->RefreshInformation();
+				}
 				break;
 			default:
 				$this->LogMessage("An undefined ident was used","CRIT");
@@ -122,6 +127,8 @@ class WMM extends IPSModule {
 		}
 
 		$this->LogMessage("Refresh in progress","DEBUG");
+		
+		SetValue($this->GetIDForIdent("PowerAvg"), $this->getAverageValue());
 	}
 	
 	public function MessageSink($TimeStamp, $SenderId, $Message, $Data) {
@@ -144,6 +151,6 @@ class WMM extends IPSModule {
 
 		$avgPower = $sumPower / count($arrPower);
 
-		SetValue($this->GetIDForIdent("PowerAvg"), $avgPower);
+		return $avgPower;
 	}
 }

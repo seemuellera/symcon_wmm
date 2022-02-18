@@ -204,6 +204,9 @@ class WMM extends IPSModule {
 				$this->LogMessage("Machine changed from running to finished","DEBUG");
 				return 2;
 			}
+			
+			// Nothing changed. Keeping old status (either standby or running)
+			return $oldMachineStatus;
 		}
 		
 		// machine is running

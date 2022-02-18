@@ -65,6 +65,7 @@ class WMM extends IPSModule {
 		$this->RegisterVariableInteger("MinutesFinished","Minutes since finish",$variableProfileRuntime);
 		$this->RegisterVariableInteger("MinutesStarted","Minutes since start",$variableProfileRuntime);
 		$this->RegisterVariableInteger("MinutesRemaining","Minutes remaining typically",$variableProfileRuntime);
+		$this->RegisterVariableInteger("Progress","Progress","~Intensity.100");
 				
 		// Timer
 		$this->RegisterTimer("RefreshInformation", 0 , 'WMM_RefreshInformation($_IPS[\'TARGET\']);');
@@ -174,6 +175,7 @@ class WMM extends IPSModule {
 		SetValue($this->GetIDForIdent("MinutesFinished"), $this->getMinutesSinceFinish());
 		SetValue($this->GetIDForIdent("MinutesStarted"), $this->getMinutesSinceStart());
 		SetValue($this->GetIDForIdent("MinutesRemaining"), $this->getRemainingMinutes());
+		SetValue($this->GetIDForIdent("Progress"), $this->getProgress());
 	}
 	
 	public function MessageSink($TimeStamp, $SenderId, $Message, $Data) {
@@ -299,5 +301,24 @@ class WMM extends IPSModule {
 		$timeDiffMinutes = round($timeDiffSeconds / 60, 0);
 		
 		return $timeDiffMinutes;
+	}
+	
+	private function getProgress() {
+		
+		$remainingMinutes = $this->getRemainingMinutes();
+		
+		// return 0 if progress cannot be calculated
+		if ($remainingMinutes == -1) {
+			
+			return 0;
+		}
+		
+		$typicalMinutes = $this->ReadPropertyInteger("TypicalRuntime");
+		
+		$percentageRemaining = round($typicalMinutes / 100 * $remainingMinutes, 0);
+		
+		$progress = 100 - $percentageRemaining;
+		
+		return $progress;
 	}
 }

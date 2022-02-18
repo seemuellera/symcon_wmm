@@ -28,6 +28,10 @@ class WMM extends IPSModule {
 		$this->RegisterPropertyInteger("StandbyThreshold",10);
 		$this->RegisterPropertyInteger("OffThreshold",1);
 		
+		//Attributes
+		$this->RegisterAttributeInteger("LastFinish",0);
+		$this->RegisterAttributeInteger("LastStart",0);
+				
 		// Variable profiles
 		$variableProfileMachineStatus = "WMM.MachineStatus";
 		if (IPS_VariableProfileExists($variableProfileMachineStatus) ) {
@@ -41,10 +45,23 @@ class WMM extends IPSModule {
 		IPS_SetVariableProfileAssociation($variableProfileMachineStatus, 2, "beendet", "Flag", 0xD900FF);
 		IPS_SetVariableProfileAssociation($variableProfileMachineStatus, 3, "Standby", "Power", 0xCFCFCF);
 		
+		$variableProfileRuntime = "WMM.Runtime";
+		if (IPS_VariableProfileExists($variableProfileRuntime) ) {
+		
+			IPS_DeleteVariableProfile($variableProfileRuntime);
+		}			
+		IPS_CreateVariableProfile($variableProfileRuntime, 1);
+		IPS_SetVariableProfileIcon($variableProfileRuntime, "Hourglass");
+		IPS_SetVariableProfileAssociation($variableProfileRuntime, -1, "-", "", -1);
+		IPS_SetVariableProfileAssociation($variableProfileRuntime, 1, "%d", "", -1);
+		
+		
 		// Variables
 		$this->RegisterVariableBoolean("Status","Status","~Switch");
 		$this->RegisterVariableFloat("PowerAvg","Average Power Consumption","~Watt.3680");
 		$this->RegisterVariableInteger("MachineStatus","Machine Status",$variableProfileMachineStatus);
+		$this->RegisterVariableInteger("MinutesFinished","Minutes since finsihed",$variableProfileRuntime);
+		$this->RegisterVariableInteger("MinutesStarted","Minutes since start",$variableProfileRuntime);
 				
 		// Timer
 		$this->RegisterTimer("RefreshInformation", 0 , 'WMM_RefreshInformation($_IPS[\'TARGET\']);');
@@ -150,6 +167,8 @@ class WMM extends IPSModule {
 		
 		SetValue($this->GetIDForIdent("PowerAvg"), $this->getAverageValue());
 		SetValue($this->GetIDForIdent("MachineStatus"), $this->getMachineStatus());
+		SetValue($this->GetIDForIdent("MinutesFinished"), $this->getMinutesSinceFinish());
+		SetValue($this->GetIDForIdent("MinutesStarted"), $this->getMinutesSinceStart());
 	}
 	
 	public function MessageSink($TimeStamp, $SenderId, $Message, $Data) {
@@ -186,6 +205,8 @@ class WMM extends IPSModule {
 		if ($powerAvg <= $offThreshold) {
 			
 			$this->LogMessage("The machine changed to off","DEBUG");
+			$this->WriteAttributeInteger("LastFinish", 0);
+			$this->WriteAttributeInteger("LastStart", 0);
 			return 0;
 		}
 		
@@ -202,6 +223,7 @@ class WMM extends IPSModule {
 			if ($oldMachineStatus == 1) {
 				
 				$this->LogMessage("Machine changed from running to finished","DEBUG");
+				$this->WriteAttributeInteger("LastFinish", time());
 				return 2;
 			}
 			
@@ -210,6 +232,36 @@ class WMM extends IPSModule {
 		}
 		
 		// machine is running
+		$this->WriteAttributeInteger("LastFinish", 0);
+		$this->WriteAttributeInteger("LastStart", time());
 		return 1;
+	}
+	
+	private function getMinutesSinceFinish() {
+		
+		// return 0 if last finish is not initialized
+		if ($this->ReadAttributeInteger("LastFinish") == 0) {
+			
+			return -1;
+		}
+		
+		$timeDiffSec = time() - $this->ReadAttributeInteger("LastFinish");
+		$timeDiffMin = round ($timeDiffSec / 60, 0);
+		
+		return $timeDiffMin;
+	}
+	
+	private function getMinutesSinceStart() {
+		
+		// return 0 if last finish is not initialized
+		if ($this->ReadAttributeInteger("LastStart") == 0) {
+			
+			return -1;
+		}
+		
+		$timeDiffSec = time() - $this->ReadAttributeInteger("LastStart");
+		$timeDiffMin = round ($timeDiffSec / 60, 0);
+		
+		return $timeDiffMin;
 	}
 }

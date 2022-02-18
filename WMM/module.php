@@ -91,8 +91,8 @@ class WMM extends IPSModule {
 		$form['elements'][] = Array("type" => "SelectVariable", "name" => "SourceVariable", "caption" => "Source Variable");
 		$form['elements'][] = Array("type" => "SelectModule", "name" => "ArchiveId", "caption" => "Select Archive instance", "moduleID" => "{43192F0B-135B-4CE7-A0A7-1475603F3060}");
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "MinutesAvg", "caption" => "Average minutes to be used for power load");
-		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "StandbyThreshold", "caption" => "Threshold below which the machine is considered to be in Standby / finished");
-		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "OffThreshold", "caption" => "Threshold below which the machine is considered to be off");
+		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "StandbyThreshold", "caption" => "Threshold below which the machine is considered to be in Standby / finished", "digits" => 2);
+		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "OffThreshold", "caption" => "Threshold below which the machine is considered to be off", "digits" => 2);
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "TypicalRuntime", "caption" => "Typical Runtime for a machine run");
 				
 		// Add the buttons for the test center

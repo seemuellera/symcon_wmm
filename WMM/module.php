@@ -25,8 +25,8 @@ class WMM extends IPSModule {
 		$this->RegisterPropertyInteger("SourceVariable",0);
 		$this->RegisterPropertyInteger("ArchiveId",0);
 		$this->RegisterPropertyInteger("MinutesAvg",5);
-		$this->RegisterPropertyInteger("StandbyThreshold",10);
-		$this->RegisterPropertyInteger("OffThreshold",1);
+		$this->RegisterPropertyFloat("StandbyThreshold",10);
+		$this->RegisterPropertyFloat("OffThreshold",1);
 		$this->RegisterPropertyInteger("TypicalRuntime",0);
 		
 		//Attributes
@@ -204,8 +204,8 @@ class WMM extends IPSModule {
 	private function getMachineStatus() {
 		
 		$powerAvg = $this->getAverageValue();
-		$standbyThreshold = $this->ReadPropertyInteger("StandbyThreshold");
-		$offThreshold = $this->ReadPropertyInteger("OffThreshold");
+		$standbyThreshold = $this->ReadPropertyFloat("StandbyThreshold");
+		$offThreshold = $this->ReadPropertyFloat("OffThreshold");
 		$oldMachineStatus = GetValue($this->GetIDForIdent("MachineStatus"));
 		
 		

@@ -27,6 +27,7 @@ class WMM extends IPSModule {
 		$this->RegisterPropertyInteger("MinutesAvg",5);
 		$this->RegisterPropertyInteger("StandbyThreshold",10);
 		$this->RegisterPropertyInteger("OffThreshold",1);
+		$this->RegisterPropertyInteger("TypicalRuntime",0);
 		
 		//Attributes
 		$this->RegisterAttributeInteger("LastFinish",0);
@@ -63,6 +64,7 @@ class WMM extends IPSModule {
 		$this->RegisterVariableInteger("MachineStatus","Machine Status",$variableProfileMachineStatus);
 		$this->RegisterVariableInteger("MinutesFinished","Minutes since finsihed",$variableProfileRuntime);
 		$this->RegisterVariableInteger("MinutesStarted","Minutes since start",$variableProfileRuntime);
+		$this->RegisterVariableInteger("MinutesRemaining","Minutes remaining (typical)",$variableProfileRuntime);
 				
 		// Timer
 		$this->RegisterTimer("RefreshInformation", 0 , 'WMM_RefreshInformation($_IPS[\'TARGET\']);');
@@ -170,6 +172,7 @@ class WMM extends IPSModule {
 		SetValue($this->GetIDForIdent("MachineStatus"), $this->getMachineStatus());
 		SetValue($this->GetIDForIdent("MinutesFinished"), $this->getMinutesSinceFinish());
 		SetValue($this->GetIDForIdent("MinutesStarted"), $this->getMinutesSinceStart());
+		SetValue($this->GetIDForIdent("MinutesRemaining"), $this->getRemainingMinutes());
 	}
 	
 	public function MessageSink($TimeStamp, $SenderId, $Message, $Data) {
@@ -254,7 +257,7 @@ class WMM extends IPSModule {
 	
 	private function getMinutesSinceStart() {
 		
-		// return 0 if last finish is not initialized
+		// return n/a if no start timestamp is set (machine is not in mode running)
 		if ($this->ReadAttributeInteger("LastStart") == 0) {
 			
 			return -1;
@@ -264,5 +267,36 @@ class WMM extends IPSModule {
 		$timeDiffMin = round ($timeDiffSec / 60, 0);
 		
 		return $timeDiffMin;
+	}
+	
+	privateFunction getRemainingMinutes() {
+		
+		// return n/a if the user has not specified a typical runtime
+		if ($this->ReadPropertyInteger("TypicalRuntime") == 0) {
+			
+			return -1;
+		}
+		
+		// return n/a if no start timestamp is set (machine is not in mode running)
+		if ($this->ReadAttributeInteger("LastStart") == 0) {
+			
+			return -1;
+		}
+		
+		$typicalRuntimeSeconds = $this->ReadPropertyInteger("TypicalRuntime") * 60;
+		
+		$timestampEnd = $this->ReadAttributeInteger("LastStart") + $typicalRuntimeSeconds;
+		
+		$timeDiffSeconds = $timestampEnd - time();
+		
+		// return 0 remaining minutes if the difference is negative (run took longer than expected)
+		if ($timeDiffSeconds < 0) {
+			
+			return 0;
+		}
+		
+		$timeDiffMinutes = round($timeDiffSeconds / 60, 0);
+		
+		return $timeDiffMinutes;
 	}
 }

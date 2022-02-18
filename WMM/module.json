@@ -1,0 +1,14 @@
+{
+  "id": "{284ADAD7-A470-421A-B52A-B058F59FF983}",
+  "name": "WMM",
+  "type": 3,
+  "vendor": "Andreas Seemueller",
+  "aliases": 
+  [
+	  "WMM"
+  ],
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "WMM"
+}

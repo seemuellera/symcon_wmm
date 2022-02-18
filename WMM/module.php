@@ -52,6 +52,7 @@ class WMM extends IPSModule {
 		}			
 		IPS_CreateVariableProfile($variableProfileRuntime, 1);
 		IPS_SetVariableProfileIcon($variableProfileRuntime, "Hourglass");
+		IPS_SetVariableProfileText($variableProfileRuntime, "", " min");
 		IPS_SetVariableProfileAssociation($variableProfileRuntime, -1, "-", "", -1);
 		IPS_SetVariableProfileAssociation($variableProfileRuntime, 1, "%d", "", -1);
 		

@@ -62,9 +62,9 @@ class WMM extends IPSModule {
 		$this->RegisterVariableBoolean("Status","Status","~Switch");
 		$this->RegisterVariableFloat("PowerAvg","Average Power Consumption","~Watt.3680");
 		$this->RegisterVariableInteger("MachineStatus","Machine Status",$variableProfileMachineStatus);
-		$this->RegisterVariableInteger("MinutesFinished","Minutes since finsihed",$variableProfileRuntime);
+		$this->RegisterVariableInteger("MinutesFinished","Minutes since finish",$variableProfileRuntime);
 		$this->RegisterVariableInteger("MinutesStarted","Minutes since start",$variableProfileRuntime);
-		$this->RegisterVariableInteger("MinutesRemaining","Minutes remaining (typical)",$variableProfileRuntime);
+		$this->RegisterVariableInteger("MinutesRemaining","Minutes remaining typically",$variableProfileRuntime);
 				
 		// Timer
 		$this->RegisterTimer("RefreshInformation", 0 , 'WMM_RefreshInformation($_IPS[\'TARGET\']);');
@@ -92,6 +92,7 @@ class WMM extends IPSModule {
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "MinutesAvg", "caption" => "Average minutes to be used for power load");
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "StandbyThreshold", "caption" => "Threshold below which the machine is considered to be in Standby / finished");
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "OffThreshold", "caption" => "Threshold below which the machine is considered to be off");
+		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "TypicalRuntime", "caption" => "Typical Runtime for a machine run");
 				
 		// Add the buttons for the test center
 		$form['actions'][] = Array(	"type" => "Button", "label" => "Refresh", "onClick" => 'WMM_RefreshInformation($id);');
@@ -269,7 +270,7 @@ class WMM extends IPSModule {
 		return $timeDiffMin;
 	}
 	
-	privateFunction getRemainingMinutes() {
+	private function getRemainingMinutes() {
 		
 		// return n/a if the user has not specified a typical runtime
 		if ($this->ReadPropertyInteger("TypicalRuntime") == 0) {

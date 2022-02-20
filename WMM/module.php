@@ -266,7 +266,7 @@ class WMM extends IPSModule {
 		}
 		
 		$timeDiffSec = time() - $this->ReadAttributeInteger("LastFinish");
-		$timeDiffMin = round ($timeDiffSec / 60, 0);
+		$timeDiffMin = round($timeDiffSec / 60);
 		
 		return $timeDiffMin;
 	}
@@ -280,7 +280,7 @@ class WMM extends IPSModule {
 		}
 		
 		$timeDiffSec = time() - $this->ReadAttributeInteger("LastStart");
-		$timeDiffMin = round ($timeDiffSec / 60, 0);
+		$timeDiffMin = round($timeDiffSec / 60);
 		
 		return $timeDiffMin;
 	}
@@ -311,7 +311,7 @@ class WMM extends IPSModule {
 			return 0;
 		}
 		
-		$timeDiffMinutes = round($timeDiffSeconds / 60, 0);
+		$timeDiffMinutes = round($timeDiffSeconds / 60);
 		
 		return $timeDiffMinutes;
 	}

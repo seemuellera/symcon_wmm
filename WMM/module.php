@@ -234,7 +234,10 @@ class WMM extends IPSModule {
 			if ($oldMachineStatus == 1) {
 				
 				$this->LogMessage("Machine changed from running to finished","DEBUG");
-				$this->WriteAttributeInteger("LastFinish", time());
+				if ($this->ReadAttributeInteger("LastFinish") == 0) {
+				
+					$this->WriteAttributeInteger("LastFinish", time());
+				}
 				return 2;
 			}
 	
@@ -246,7 +249,10 @@ class WMM extends IPSModule {
 		// machine is running
 		$this->LogMessage("Machine is running","DEBUG");
 		$this->WriteAttributeInteger("LastFinish", 0);
-		$this->WriteAttributeInteger("LastStart", time());
+		if ($this->ReadAttributeInteger("LastStart") == 0) {
+		
+			$this->WriteAttributeInteger("LastStart", time());
+		}
 		return 1;
 	}
 	

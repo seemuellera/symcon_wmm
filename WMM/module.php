@@ -176,6 +176,10 @@ class WMM extends IPSModule {
 		SetValue($this->GetIDForIdent("MinutesStarted"), $this->getMinutesSinceStart());
 		SetValue($this->GetIDForIdent("MinutesRemaining"), $this->getRemainingMinutes());
 		SetValue($this->GetIDForIdent("Progress"), $this->getProgress());
+
+		// More Debug
+		$this->LogMessage("Timestamp last start: " . $this->ReadAttributeInteger("LastStart"), "DEBUG");
+		$this->LogMessage("Timestamp last finish: " . $this->ReadAttributeInteger("LastFinish"), "DEBUG");
 	}
 	
 	public function MessageSink($TimeStamp, $SenderId, $Message, $Data) {

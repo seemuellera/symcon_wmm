@@ -239,6 +239,7 @@ class WMM extends IPSModule {
 		}
 		
 		// machine is running
+		$this->LogMessage("Machine is running","DEBUG");
 		$this->WriteAttributeInteger("LastFinish", 0);
 		$this->WriteAttributeInteger("LastStart", time());
 		return 1;

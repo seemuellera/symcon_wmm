@@ -233,10 +233,23 @@ class WMM extends IPSModule {
 				$this->WriteAttributeInteger("LastFinish", time());
 				return 2;
 			}
-			
+	
 			// Nothing changed. Keeping old status (either standby or running)
 			return $oldMachineStatus;
 		}
+
+		// This part is reached when the energy is higher than standby threshold
+		if ($oldMachineStatus == 2) {
+
+			// probably just a fluke. Stay at 2, do not switch back to 1
+			return 2;
+		} 
+
+		if ($oldMachineStatus == 3) {
+
+			// probably just a fluke. Stay at 3, do not switch back to 1
+			return 3;
+		} 
 		
 		// machine is running
 		$this->LogMessage("Machine is running","DEBUG");
@@ -254,7 +267,7 @@ class WMM extends IPSModule {
 		}
 		
 		$timeDiffSec = time() - $this->ReadAttributeInteger("LastFinish");
-		$timeDiffMin = round ($timeDiffSec / 60, 0);
+		$timeDiffMin = round($timeDiffSec / 60);
 		
 		return $timeDiffMin;
 	}
@@ -268,7 +281,7 @@ class WMM extends IPSModule {
 		}
 		
 		$timeDiffSec = time() - $this->ReadAttributeInteger("LastStart");
-		$timeDiffMin = round ($timeDiffSec / 60, 0);
+		$timeDiffMin = round($timeDiffSec / 60);
 		
 		return $timeDiffMin;
 	}
@@ -299,7 +312,7 @@ class WMM extends IPSModule {
 			return 0;
 		}
 		
-		$timeDiffMinutes = round($timeDiffSeconds / 60, 0);
+		$timeDiffMinutes = round($timeDiffSeconds / 60);
 		
 		return $timeDiffMinutes;
 	}

@@ -235,20 +235,8 @@ class WMM extends IPSModule {
 			}
 	
 			// Nothing changed. Keeping old status (either standby or running)
+			$this->LogMessage("The machine status has not changed","DEBUG");
 			return $oldMachineStatus;
-		}
-
-		// This part is reached when the energy is higher than standby threshold
-		if ($oldMachineStatus == 2) {
-
-			// probably just a fluke. Stay at 2, do not switch back to 1
-			return 2;
-		} 
-
-		if ($oldMachineStatus == 3) {
-
-			// probably just a fluke. Stay at 3, do not switch back to 1
-			return 3;
 		} 
 		
 		// machine is running

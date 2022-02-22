@@ -327,7 +327,7 @@ class WMM extends IPSModule {
 		
 		$typicalMinutes = $this->ReadPropertyInteger("TypicalRuntime");
 		
-		$progress = round( (100 / $typicalMinutes) * minutesSinceStart) , 0);
+		$progress = round( (100 / $typicalMinutes) * minutesSinceStart, 0);
 		
 		return $progress;
 	}

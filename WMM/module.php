@@ -317,19 +317,17 @@ class WMM extends IPSModule {
 	
 	private function getProgress() {
 		
-		$remainingMinutes = $this->getRemainingMinutes();
+		$minutesSinceStart = $this->getMinutesSinceStart();
 		
 		// return 0 if progress cannot be calculated
-		if ($remainingMinutes == -1) {
+		if ($minutesSinceStart == -1) {
 			
 			return 0;
 		}
 		
 		$typicalMinutes = $this->ReadPropertyInteger("TypicalRuntime");
 		
-		$percentageRemaining = round($typicalMinutes / 100 * $remainingMinutes, 0);
-		
-		$progress = 100 - $percentageRemaining;
+		$progress = round( (100 / $typicalMinutes) * minutesSinceStart) , 0);
 		
 		return $progress;
 	}

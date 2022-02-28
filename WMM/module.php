@@ -324,6 +324,12 @@ class WMM extends IPSModule {
 			
 			return 0;
 		}
+
+		// return 100 if the machine has finished
+		if ($this->ReadAttributeInteger("LastFinish") != 0) {
+
+			return 100;
+		}
 		
 		$typicalMinutes = $this->ReadPropertyInteger("TypicalRuntime");
 		
